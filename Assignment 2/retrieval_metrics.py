@@ -1,4 +1,3 @@
-import ast
 import math
 
 import numpy as np
@@ -103,15 +102,13 @@ class RetrievalMetrics:
             # Iterate through each method and its entries
             for method_name, entries in methods.items():
                 for entry in entries:
-                    ground_truth_str = entry['ground_truth']
+                    ground_truth = entry['ground_truth']
                     # Safely evaluate the string to a dictionary
-                    ground_truth = ast.literal_eval(ground_truth_str)
-                    ground_truth_texts = ground_truth['text']
-                    contexts = entry['contexts']
+                    predicted_answer = entry['predicted_answer']
 
                     # Evaluate metrics
-                    scores = metrics_calculator.evaluate(contexts,
-                                                         ground_truth_texts)
+                    scores = metrics_calculator.evaluate(predicted_answer,
+                                                         ground_truth)
 
                     # Append each metric to the aggregate lists
                     for metric_name, value in scores.items():

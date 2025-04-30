@@ -1,3 +1,4 @@
+import ast
 import json
 import pickle
 
@@ -327,10 +328,12 @@ class LLMPrediction:
                         # Create input for a single question-context pair
                         input_data.append({"question": question,
                                            "context": context})
+                        print(item["answer"])
                         retriever_answers.append(
                             {
                                 "question": item["question"],
-                                "ground_truth": item["answer"],
+                                "ground_truth": ast.literal_eval(
+                                    item["answer"])["text"][0],
                                 "contexts": item["contexts"],
                             }
                         )
@@ -338,10 +341,11 @@ class LLMPrediction:
                         # Generate prediction
                     prediction = self.qa_chain.apply(input_data)
                     print(f"Got Prediction for {top_k_key} - {retriever_name}")
-                    for data, pred in zip(temp_answers, prediction):
-                        data["predicted_answer"] = pred["text"]
-                        retriever_answers.append(data)
-                llm_answers[top_k_key][retriever_name] = retriever_answers
+                    for i in range(len(retriever_answers)):
+                        retriever_answers[i]["predicted_answer"] = \
+                            prediction[i]["text"]
+
+                    llm_answers[top_k_key][retriever_name] = retriever_answers
             return llm_answers
         except Exception as e:
             print(f"[Error in llm_prediction] {str(e)}")
